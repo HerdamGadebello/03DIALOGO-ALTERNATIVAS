@@ -227,6 +227,14 @@
         .incorrect {
             color: #C8102E;
         }
+        .correct-answer {
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: white;
+            margin-top: 10px;
+            min-height: 30px;
+        }
         .navigation-btns {
             display: flex;
             justify-content: center;
@@ -302,6 +310,23 @@
         .results-mascot {
             width: 200px;
             margin-top: 20px;
+        }
+        #restart-button {
+            background-color: #002F6C;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-family: 'Franklin Gothic Demi', sans-serif;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+        #restart-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -379,6 +404,7 @@
             <div class="french-word" id="french-word"></div>
             <div class="options-container" id="options-container"></div>
             <div class="feedback" id="feedback"></div>
+            <div class="correct-answer" id="correct-answer"></div>
             <div class="navigation-btns">
                 <button class="nav-btn" id="prev-btn">VOLTAR</button>
                 <button class="nav-btn" id="next-btn">AVANÇAR</button>
@@ -391,6 +417,7 @@
             <div class="results-header" id="results-title"></div>
             <div class="results-message" id="results-message"></div>
             <img class="results-mascot" id="results-mascot" src="" alt="Mascote">
+            <button id="restart-button">REFAZER TESTE</button>
         </div>
     </div>
     <audio id="button-audio" src="BUTTON.mp3"></audio>
@@ -400,21 +427,21 @@
     <audio id="negative-audio" src="NEGATIVO.mp3"></audio>
     <script>
         const quizData = [
-            { french: "Comment ça va ?", audio: "COMMENT ÇA VA.mp3", options: ["Como vai ?", "Tudo bem?", "E você?", "Nada mal"], correct: 0 },
-            { french: "Ça va ?", audio: "ÇA VA (PERGUNTA).mp3", options: ["Tudo bem?", "Como vai ?", "Tudo indo bem!", "Nada mal"], correct: 0 },
-            { french: "Ça va!", audio: "ÇA VA (RESPOSTA).mp3", options: ["Tudo bem!", "Nada mal", "E você?", "Como vai ?"], correct: 0 },
-            { french: "Et toi ?", audio: "ET TOI.mp3", options: ["E você?", "Tudo bem?", "Nada mal", "Como vai ?"], correct: 0 },
-            { french: "Pas mal", audio: "PAS MAL.mp3", options: ["Nada mal", "Tudo bem!", "E você?", "Como vai ?"], correct: 0 },
-            { french: "Ça va bien!", audio: "ÇA VA BIEN.mp3", options: ["Tudo indo bem!", "Nada mal", "E você?", "Tudo bem?"], correct: 0 },
-            { french: "Comment tu t’appelles ?", audio: "COMMENT TU T'APPELLES.mp3", options: ["Como você se chama ?", "Qual a tua idade ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
-            { french: "Quel âge as-tu ?", audio: "QUEL ÂGE AS-TU.mp3", options: ["Qual a tua idade ?", "Como você se chama ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
-            { french: "Comment vous vous appelez ?", audio: "COMMENT VOUS VOUS APPELEZ.mp3", options: ["Como você se chama", "Qual a tua idade ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
-            { french: "Quel âge avez-vous ?", audio: "QUEL ÂGE AVEZ-VOUS.mp3", options: ["Qual a tua idade ?", "Como você se chama", "Você mora onde?", "De onde você vem?"], correct: 0 },
-            { french: "D’où viens-tu ?", audio: "D'OÙ VIENS-TU.mp3", options: ["De onde você vem?", "Qual a tua idade ?", "Você mora onde?", "Como você se chama ?"], correct: 0 },
-            { french: "Tu habites où?", audio: "TU HABITES OÙ.mp3", options: ["Você mora onde?", "Qual a tua idade ?", "De onde você vem?", "Como você se chama ?"], correct: 0 },
-            { french: "D’où venez-vous ?", audio: "D'OÙ VENEZ-VOUS.mp3", options: ["De onde você vem?", "Qual a tua idade ?", "Você mora onde?", "Como você se chama"], correct: 0 },
-            { french: "Vous habitez où ?", audio: "VOUS HABITEZ OÙ.mp3", options: ["Você mora onde?", "Qual a tua idade ?", "De onde você vem?", "Como você se chama"], correct: 0 },
-            { french: "J’habite à Curitiba", audio: "J'HABITE À CURITIBA.mp3", options: ["Eu moro em Curitiba", "Você mora onde?", "De onde você vem?", "Como você se chama"], correct: 0 }
+            { french: "Comment ça va ?", audio: "COMMENT ÇA VA.mp3", correctAnswer: "Como vai ?", options: ["Como vai ?", "Tudo bem?", "E você?", "Nada mal"], correct: 0 },
+            { french: "Ça va ?", audio: "ÇA VA (PERGUNTA).mp3", correctAnswer: "Tudo bem?", options: ["Tudo bem?", "Como vai ?", "Tudo indo bem!", "Nada mal"], correct: 0 },
+            { french: "Ça va!", audio: "ÇA VA (RESPOSTA).mp3", correctAnswer: "Tudo bem!", options: ["Tudo bem!", "Nada mal", "E você?", "Como vai ?"], correct: 0 },
+            { french: "Et toi ?", audio: "ET TOI.mp3", correctAnswer: "E você? (uso informal)", options: ["E você?", "Tudo bem?", "Nada mal", "Como vai ?"], correct: 0 },
+            { french: "Pas mal", audio: "PAS MAL.mp3", correctAnswer: "Nada mal / Legal / Beleza", options: ["Nada mal", "Tudo bem!", "E você?", "Como vai ?"], correct: 0 },
+            { french: "Ça va bien!", audio: "ÇA VA BIEN.mp3", correctAnswer: "Tudo indo bem! / Tô bem!", options: ["Tudo indo bem!", "Nada mal", "E você?", "Tudo bem?"], correct: 0 },
+            { french: "Comment tu t’appelles ?", audio: "COMMENT TU T'APPELLES.mp3", correctAnswer: "Como você se chama ? (uso informal)", options: ["Como você se chama ?", "Qual a tua idade ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
+            { french: "Quel âge as-tu ?", audio: "QUEL ÂGE AS-TU.mp3", correctAnswer: "Qual a tua idade ? / Quantos anos você tem? (uso informal)", options: ["Qual a tua idade ?", "Como você se chama ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
+            { french: "Comment vous vous appelez ?", audio: "COMMENT VOUS VOUS APPELEZ.mp3", correctAnswer: "Como você se chama (uso formal, literalmente 'Como vós vos chamais?')", options: ["Como você se chama", "Qual a tua idade ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
+            { french: "Quel âge avez-vous ?", audio: "QUEL ÂGE AVEZ-VOUS.mp3", correctAnswer: "Qual a tua idade ? / Quantos anos você tem? (uso formal, literalmente 'Qual idade vós tendes?')", options: ["Qual a tua idade ?", "Como você se chama", "Você mora onde?", "De onde você vem?"], correct: 0 },
+            { french: "D’où viens-tu ?", audio: "D'OÙ VIENS-TU.mp3", correctAnswer: "De onde você vem? (uso informal, literalmente 'De onde vens tu?')", options: ["De onde você vem?", "Qual a tua idade ?", "Você mora onde?", "Como você se chama ?"], correct: 0 },
+            { french: "Tu habites où?", audio: "TU HABITES OÙ.mp3", correctAnswer: "Você mora onde? (uso informal, literalmente 'Tu habitas onde?')", options: ["Você mora onde?", "Qual a tua idade ?", "De onde você vem?", "Como você se chama ?"], correct: 0 },
+            { french: "D’où venez-vous ?", audio: "D'OÙ VENEZ-VOUS.mp3", correctAnswer: "De onde você vem? (uso formal, literalmente 'De onde vindes vós?')", options: ["De onde você vem?", "Qual a tua idade ?", "Você mora onde?", "Como você se chama"], correct: 0 },
+            { french: "Vous habitez où ?", audio: "VOUS HABITEZ OÙ.mp3", correctAnswer: "Você mora onde? (uso formal, literalmente 'Vós habitais onde?')", options: ["Você mora onde?", "Qual a tua idade ?", "De onde você vem?", "Como você se chama"], correct: 0 },
+            { french: "J’habite à Curitiba", audio: "J'HABITE À CURITIBA.mp3", correctAnswer: "Eu moro em Curitiba", options: ["Eu moro em Curitiba", "Você mora onde?", "De onde você vem?", "Como você se chama"], correct: 0 }
         ];
         let currentQuestion = 0;
         let score = 0;
@@ -432,6 +459,7 @@
         const frenchWord = document.getElementById('french-word');
         const optionsContainer = document.getElementById('options-container');
         const feedback = document.getElementById('feedback');
+        const correctAnswer = document.getElementById('correct-answer');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const progressBar = document.getElementById('progress-bar');
@@ -447,6 +475,7 @@
         const errorAudio = document.getElementById('error-audio');
         const positiveAudio = document.getElementById('positive-audio');
         const negativeAudio = document.getElementById('negative-audio');
+        const restartButton = document.getElementById('restart-button');
         function skipIntro() {
             introPage.classList.add('fade-out');
             setTimeout(() => {
@@ -475,6 +504,7 @@
             playBtn.addEventListener('click', playAudio);
             repeatBtn.addEventListener('click', playAudio);
             speedSelect.addEventListener('change', changeSpeed);
+            restartButton.addEventListener('click', restartQuiz);
             shuffleArray(quizData);
         });
         function startQuiz() {
@@ -486,6 +516,19 @@
             localStorage.removeItem('quizProgress');
             homePage.style.display = 'none';
             quizPage.style.display = 'flex';
+            loadQuestion();
+            setTimeout(playAudio, 500);
+        }
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answeredQuestions = new Array(quizData.length).fill(false);
+            wrongAnswers = [];
+            userAnswers = [];
+            localStorage.removeItem('quizProgress');
+            resultsPage.style.display = 'none';
+            quizPage.style.display = 'flex';
+            shuffleArray(quizData);
             loadQuestion();
             setTimeout(playAudio, 500);
         }
@@ -516,6 +559,7 @@
             updateProgressBar();
             feedback.textContent = '';
             feedback.className = 'feedback';
+            correctAnswer.textContent = '';
             isAnswerSelected = false;
             prevBtn.disabled = currentQuestion === 0;
             nextBtn.textContent = answeredQuestions.every(answered => answered) && wrongAnswers.length === 0 ? "VER RESULTADO" : "AVANÇAR";
@@ -542,6 +586,7 @@
                 errorAudio.play().catch(err => console.log("Erro ao reproduzir áudio de erro:", err));
                 if (!wrongAnswers.includes(currentQuestion)) wrongAnswers.push(currentQuestion);
             }
+            correctAnswer.textContent = `Resposta correta: ${question.correctAnswer}`;
             answeredQuestions[currentQuestion] = true;
             isAnswerSelected = true;
             showCorrectAnswer();
@@ -559,6 +604,7 @@
                 }
                 button.disabled = true;
             });
+            correctAnswer.textContent = `Resposta correta: ${question.correctAnswer}`;
         }
         function nextQuestion() {
             if (!isAnswerSelected) return;
