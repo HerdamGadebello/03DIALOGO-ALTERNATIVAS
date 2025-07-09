@@ -4,36 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz de Francês</title>
-    <link href="https://fonts.googleapis.com/css2?family=Franklin+Gothic+Demi&family=Franklin+Gothic+Heavy&family=Poppins&family=Rockwell&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Rockwell&family=Franklin+Gothic+Demi&family=Franklin+Gothic+Heavy&display=swap" rel="stylesheet">
     <style>
-        /* Reset e Estilos Globais */
+        @font-face {
+            font-family: 'Cooper Black';
+            src: url('CooperBlack.woff2') format('woff2'),
+                 url('CooperBlack.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
         }
-        
         body {
             overflow-x: hidden;
             transition: background-color 0.5s ease;
-            background-color: #F1E1AC; /* Cor de fundo padrão */
+            background-color: #F1E1AC;
         }
-        
-        /* Página de Introdução */
         #intro-page {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #002F6C; /* Azul marinho */
+            background-image: url('fundo.jpg');
+            background-size: cover;
+            background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
-        
         #intro-video {
             max-width: 90%;
             max-height: 90%;
@@ -41,8 +45,9 @@
             opacity: 1;
             transition: opacity 1s ease;
         }
-        
-        /* Página Inicial do Quiz */
+        #intro-page.fade-out {
+            opacity: 0;
+        }
         #home-page {
             display: none;
             flex-direction: column;
@@ -52,12 +57,10 @@
             background-color: #F1E1AC;
             padding: 20px;
         }
-        
         #mascot-neutral {
             width: 200px;
             margin-bottom: 30px;
         }
-        
         #start-button {
             background-color: #002F6C;
             color: white;
@@ -70,13 +73,10 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        
         #start-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
-        
-        /* Página do Quiz */
         #quiz-page {
             display: none;
             flex-direction: column;
@@ -86,14 +86,12 @@
             background-color: #F4F1EC;
             position: relative;
         }
-        
         #logo {
             position: absolute;
             top: 20px;
             left: 20px;
             height: 50px;
         }
-        
         .quiz-container {
             background-color: #002F6C;
             border-radius: 20px;
@@ -104,7 +102,6 @@
             position: relative;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
-        
         .question-header {
             background-color: #C8102E;
             color: white;
@@ -117,7 +114,6 @@
             font-size: 1.1rem;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
         #mascot-small {
             position: absolute;
             left: -30px;
@@ -125,14 +121,13 @@
             height: 100px;
             z-index: 10;
         }
-        
         .audio-controls {
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 20px 0;
+            position: relative;
         }
-        
         .audio-btn {
             background-color: #3B8C59;
             color: white;
@@ -148,24 +143,36 @@
             align-items: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        
+        .audio-playing::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -30px;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>') no-repeat center;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.2); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
         .speed-control {
             margin-left: 20px;
             display: flex;
             align-items: center;
         }
-        
         .speed-control label {
             margin-right: 10px;
             color: white;
         }
-        
         .speed-control select {
             padding: 5px;
             border-radius: 5px;
             border: none;
         }
-        
         .french-word {
             font-family: 'Franklin Gothic Heavy', sans-serif;
             font-size: 2rem;
@@ -176,14 +183,12 @@
             padding: 10px;
             border-radius: 10px;
         }
-        
         .options-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin: 30px 0;
         }
-        
         .option-btn {
             background-color: #F4F1EC;
             border: none;
@@ -196,35 +201,38 @@
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        
         .option-btn:hover {
+            background-color: #C6B9DD;
             transform: translateY(-3px);
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         }
-        
+        .option-btn.correct {
+            background-color: #3B8C59;
+            color: white;
+        }
+        .option-btn.incorrect {
+            background-color: #C8102E;
+            color: white;
+        }
         .feedback {
             text-align: center;
-            font-family: 'Franklin Gothic Heavy', sans-serif;
+            font-family: 'Cooper Black', sans-serif;
             font-size: 1.5rem;
             margin: 20px 0;
             min-height: 40px;
         }
-        
         .correct {
             color: #3B8C59;
         }
-        
         .incorrect {
             color: #C8102E;
         }
-        
         .navigation-btns {
             display: flex;
             justify-content: center;
             gap: 20px;
             margin-top: 30px;
         }
-        
         .nav-btn {
             padding: 10px 30px;
             border: none;
@@ -234,34 +242,28 @@
             transition: all 0.2s;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        
         #prev-btn {
             background-color: #F5C84C;
         }
-        
         #next-btn {
             background-color: #3B8C59;
             color: white;
         }
-        
         .progress-container {
             width: 90%;
             max-width: 800px;
             height: 10px;
-            background-color: #ddd;
+            background-color: #F4F1EC;
             border-radius: 5px;
             margin: 20px auto;
             overflow: hidden;
         }
-        
         .progress-bar {
             height: 100%;
             background-color: #10C894;
             width: 0%;
             transition: width 0.5s ease;
         }
-        
-        /* Página de Resultados */
         #results-page {
             display: none;
             flex-direction: column;
@@ -271,7 +273,6 @@
             padding: 20px;
             background-color: #F4F1EC;
         }
-        
         .results-container {
             background-color: #002F6C;
             border-radius: 20px;
@@ -282,7 +283,6 @@
             position: relative;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
-        
         .results-header {
             background-color: #C8102E;
             color: white;
@@ -292,55 +292,44 @@
             font-family: 'Franklin Gothic Demi', sans-serif;
             font-size: 2rem;
         }
-        
         .results-message {
             color: white;
             margin-bottom: 30px;
             font-size: 1.1rem;
             line-height: 1.6;
+            font-family: 'Poppins', sans-serif;
         }
-        
         .results-mascot {
             width: 200px;
             margin-top: 20px;
         }
-        
-        /* Animações */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        
         @keyframes slideIn {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
         .fade-in {
             animation: fadeIn 0.5s ease forwards;
         }
-        
         .slide-in {
             animation: slideIn 0.5s ease forwards;
         }
-        
-        /* Responsividade */
         @media (max-width: 768px) {
             .options-container {
                 grid-template-columns: 1fr;
             }
-            
             .quiz-container {
                 padding: 20px;
                 margin-top: 60px;
             }
-            
             #mascot-small {
                 height: 80px;
                 left: -20px;
                 bottom: -20px;
             }
-            
             .french-word {
                 font-size: 1.5rem;
             }
@@ -350,35 +339,29 @@
 <body>
     <!-- Página de Introdução -->
     <div id="intro-page">
-        <video id="intro-video" autoplay muted playsinline onerror="skipIntro()">
-            <source src="video/intro.mp4" type="video/mp4">
+        <video id="intro-video" autoplay muted playsinline>
+            <source src="VIDEOINTRO.mp4" type="video/mp4">
         </video>
-        <audio id="intro-audio" autoplay onerror="skipIntro()">
-            <source src="audio/intro.mp3" type="audio/mp3">
+        <audio id="intro-audio" autoplay>
+            <source src="SOMINTRO.mp3" type="audio/mp3">
         </audio>
     </div>
-    
     <!-- Página Inicial do Quiz -->
     <div id="home-page">
-        <img id="mascot-neutral" src="imagens/mascote_neutro.png" alt="Mascote">
+        <img id="mascot-neutral" src="MASCOTENEUTRO.png" alt="Mascote">
         <button id="start-button">INICIAR EXERCÍCIO</button>
     </div>
-    
     <!-- Página do Quiz -->
     <div id="quiz-page">
-        <img id="logo" src="imagens/logo.png" alt="Logo">
-        
+        <img id="logo" src="LOGODAMIAO.png" alt="Logo">
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
-        
         <div class="quiz-container">
             <div class="question-header">
                 Escolha a alternativa que melhor traduz a seguinte palavra:
             </div>
-            
-            <img id="mascot-small" src="imagens/mascote_pequeno.png" alt="Mascote Pequeno">
-            
+            <img id="mascot-small" src="MASCOTENINHO.png" alt="Mascote Pequeno">
             <div class="audio-controls">
                 <button class="audio-btn" id="play-btn">▶</button>
                 <button class="audio-btn" id="repeat-btn">↻</button>
@@ -393,20 +376,15 @@
                     </select>
                 </div>
             </div>
-            
             <div class="french-word" id="french-word"></div>
-            
             <div class="options-container" id="options-container"></div>
-            
             <div class="feedback" id="feedback"></div>
-            
             <div class="navigation-btns">
                 <button class="nav-btn" id="prev-btn">VOLTAR</button>
                 <button class="nav-btn" id="next-btn">AVANÇAR</button>
             </div>
         </div>
     </div>
-    
     <!-- Página de Resultados -->
     <div id="results-page">
         <div class="results-container">
@@ -415,31 +393,29 @@
             <img class="results-mascot" id="results-mascot" src="" alt="Mascote">
         </div>
     </div>
-    
+    <audio id="button-audio" src="BUTTON.mp3"></audio>
+    <audio id="win-audio" src="WIN.wav"></audio>
+    <audio id="error-audio" src="ERROR.wav"></audio>
+    <audio id="positive-audio" src="POSITIVO.mp3"></audio>
+    <audio id="negative-audio" src="NEGATIVO.mp3"></audio>
     <script>
-        // Dados do Quiz
         const quizData = [
-            {
-                french: "Bonjour",
-                audio: "audio/bonjour.mp3",
-                options: ["Bom dia", "Boa noite", "Obrigado", "Tchau"],
-                correct: 0
-            },
-            {
-                french: "Merci",
-                audio: "audio/merci.mp3",
-                options: ["Obrigado", "Por favor", "De nada", "Com licença"],
-                correct: 0
-            },
-            {
-                french: "Au revoir",
-                audio: "audio/au_revoir.mp3",
-                options: ["Tchau", "Bom dia", "Boa noite", "Olá"],
-                correct: 0
-            }
+            { french: "Comment ça va ?", audio: "COMMENT ÇA VA.mp3", options: ["Como vai ?", "Tudo bem?", "E você?", "Nada mal"], correct: 0 },
+            { french: "Ça va ?", audio: "ÇA VA (PERGUNTA).mp3", options: ["Tudo bem?", "Como vai ?", "Tudo indo bem!", "Nada mal"], correct: 0 },
+            { french: "Ça va!", audio: "ÇA VA (RESPOSTA).mp3", options: ["Tudo bem!", "Nada mal", "E você?", "Como vai ?"], correct: 0 },
+            { french: "Et toi ?", audio: "ET TOI.mp3", options: ["E você?", "Tudo bem?", "Nada mal", "Como vai ?"], correct: 0 },
+            { french: "Pas mal", audio: "PAS MAL.mp3", options: ["Nada mal", "Tudo bem!", "E você?", "Como vai ?"], correct: 0 },
+            { french: "Ça va bien!", audio: "ÇA VA BIEN.mp3", options: ["Tudo indo bem!", "Nada mal", "E você?", "Tudo bem?"], correct: 0 },
+            { french: "Comment tu t’appelles ?", audio: "COMMENT TU T'APPELLES.mp3", options: ["Como você se chama ?", "Qual a tua idade ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
+            { french: "Quel âge as-tu ?", audio: "QUEL ÂGE AS-TU.mp3", options: ["Qual a tua idade ?", "Como você se chama ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
+            { french: "Comment vous vous appelez ?", audio: "COMMENT VOUS VOUS APPELEZ.mp3", options: ["Como você se chama", "Qual a tua idade ?", "Você mora onde?", "De onde você vem?"], correct: 0 },
+            { french: "Quel âge avez-vous ?", audio: "QUEL ÂGE AVEZ-VOUS.mp3", options: ["Qual a tua idade ?", "Como você se chama", "Você mora onde?", "De onde você vem?"], correct: 0 },
+            { french: "D’où viens-tu ?", audio: "D'OÙ VIENS-TU.mp3", options: ["De onde você vem?", "Qual a tua idade ?", "Você mora onde?", "Como você se chama ?"], correct: 0 },
+            { french: "Tu habites où?", audio: "TU HABITES OÙ.mp3", options: ["Você mora onde?", "Qual a tua idade ?", "De onde você vem?", "Como você se chama ?"], correct: 0 },
+            { french: "D’où venez-vous ?", audio: "D'OÙ VENEZ-VOUS.mp3", options: ["De onde você vem?", "Qual a tua idade ?", "Você mora onde?", "Como você se chama"], correct: 0 },
+            { french: "Vous habitez où ?", audio: "VOUS HABITEZ OÙ.mp3", options: ["Você mora onde?", "Qual a tua idade ?", "De onde você vem?", "Como você se chama"], correct: 0 },
+            { french: "J’habite à Curitiba", audio: "J'HABITE À CURITIBA.mp3", options: ["Eu moro em Curitiba", "Você mora onde?", "De onde você vem?", "Como você se chama"], correct: 0 }
         ];
-
-        // Variáveis de estado
         let currentQuestion = 0;
         let score = 0;
         let answeredQuestions = 0;
@@ -447,8 +423,6 @@
         let userAnswers = [];
         let isAnswerSelected = false;
         let currentAudio = null;
-        
-        // Elementos do DOM
         const introPage = document.getElementById('intro-page');
         const introVideo = document.getElementById('intro-video');
         const introAudio = document.getElementById('intro-audio');
@@ -468,19 +442,20 @@
         const playBtn = document.getElementById('play-btn');
         const repeatBtn = document.getElementById('repeat-btn');
         const speedSelect = document.getElementById('speed-select');
-        
-        // Função para pular introdução se houver erro
+        const buttonAudio = document.getElementById('button-audio');
+        const winAudio = document.getElementById('win-audio');
+        const errorAudio = document.getElementById('error-audio');
+        const positiveAudio = document.getElementById('positive-audio');
+        const negativeAudio = document.getElementById('negative-audio');
         function skipIntro() {
-            introPage.style.display = 'none';
-            homePage.style.display = 'flex';
+            introPage.classList.add('fade-out');
+            setTimeout(() => {
+                introPage.style.display = 'none';
+                homePage.style.display = 'flex';
+            }, 1000);
         }
-        
-        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
-            // Configurar fallback automático
             setTimeout(skipIntro, 5000);
-            
-            // Verificar progresso salvo
             try {
                 const savedProgress = JSON.parse(localStorage.getItem('quizProgress'));
                 if (savedProgress) {
@@ -493,8 +468,6 @@
             } catch {
                 localStorage.removeItem('quizProgress');
             }
-            
-            // Configurar eventos
             introVideo.addEventListener('ended', skipIntro);
             startButton.addEventListener('click', startQuiz);
             prevBtn.addEventListener('click', prevQuestion);
@@ -502,29 +475,29 @@
             playBtn.addEventListener('click', playAudio);
             repeatBtn.addEventListener('click', playAudio);
             speedSelect.addEventListener('change', changeSpeed);
-            
-            // Embaralhar questões
             shuffleArray(quizData);
         });
-        
-        // Funções do quiz
         function startQuiz() {
             homePage.style.display = 'none';
             quizPage.style.display = 'flex';
             loadQuestion();
-            
             setTimeout(playAudio, 500);
         }
-        
         function loadQuestion() {
+            if (currentQuestion >= quizData.length && wrongAnswers.length === 0) {
+                showResults();
+                return;
+            }
+            if (currentQuestion >= quizData.length) {
+                quizData.push(...wrongAnswers.map(index => quizData[index]));
+                wrongAnswers = [];
+                currentQuestion = 0;
+            }
             const question = quizData[currentQuestion];
             frenchWord.textContent = question.french;
-            
             const shuffledOptions = [...question.options];
             shuffleArray(shuffledOptions);
-            
             optionsContainer.innerHTML = '';
-            
             shuffledOptions.forEach((option, index) => {
                 const button = document.createElement('button');
                 button.classList.add('option-btn', 'slide-in');
@@ -533,161 +506,123 @@
                 button.addEventListener('click', () => selectAnswer(option, shuffledOptions));
                 optionsContainer.appendChild(button);
             });
-            
             updateProgressBar();
             feedback.textContent = '';
             feedback.className = 'feedback';
             isAnswerSelected = false;
             prevBtn.disabled = currentQuestion === 0;
-            nextBtn.textContent = currentQuestion === quizData.length - 1 ? "VER RESULTADO" : "AVANÇAR";
-            
+            nextBtn.textContent = currentQuestion === quizData.length - 1 && wrongAnswers.length === 0 ? "VER RESULTADO" : "AVANÇAR";
             if (userAnswers[currentQuestion] !== undefined) {
                 showCorrectAnswer();
             }
         }
-        
         function selectAnswer(selectedOption, options) {
             if (isAnswerSelected) return;
-            
             const question = quizData[currentQuestion];
             const correctOption = question.options[question.correct];
             const isCorrect = selectedOption === correctOption;
-            
             userAnswers[currentQuestion] = { selected: selectedOption, isCorrect };
-            
             if (isCorrect) {
                 score++;
                 feedback.textContent = 'CORRETO';
                 feedback.className = 'feedback correct';
-                playSound('audio/win.mp3');
-                
+                winAudio.play().catch(err => console.log("Erro ao reproduzir áudio de acerto:", err));
                 const wrongIndex = wrongAnswers.indexOf(currentQuestion);
                 if (wrongIndex !== -1) wrongAnswers.splice(wrongIndex, 1);
             } else {
                 feedback.textContent = 'INCORRETO';
                 feedback.className = 'feedback incorrect';
-                playSound('audio/error.mp3');
-                
+                errorAudio.play().catch(err => console.log("Erro ao reproduzir áudio de erro:", err));
                 if (!wrongAnswers.includes(currentQuestion)) wrongAnswers.push(currentQuestion);
             }
-            
             answeredQuestions++;
             isAnswerSelected = true;
             showCorrectAnswer();
             saveProgress();
         }
-        
         function showCorrectAnswer() {
             const question = quizData[currentQuestion];
             const correctOption = question.options[question.correct];
             const userAnswer = userAnswers[currentQuestion];
-            
             document.querySelectorAll('.option-btn').forEach(button => {
                 if (button.textContent === correctOption) {
-                    button.style.backgroundColor = '#3B8C59';
-                    button.style.color = 'white';
+                    button.classList.add('correct');
                 } else if (userAnswer && button.textContent === userAnswer.selected && !userAnswer.isCorrect) {
-                    button.style.backgroundColor = '#C8102E';
-                    button.style.color = 'white';
+                    button.classList.add('incorrect');
                 }
                 button.disabled = true;
             });
         }
-        
         function nextQuestion() {
-            playSound('audio/button.mp3');
-            
-            if (currentQuestion === quizData.length - 1) {
-                showResults();
-                return;
-            }
-            
+            if (!isAnswerSelected) return;
+            buttonAudio.play().catch(err => console.log("Erro ao reproduzir áudio do botão:", err));
             currentQuestion++;
             loadQuestion();
             playAudio();
         }
-        
         function prevQuestion() {
-            playSound('audio/button.mp3');
-            
             if (currentQuestion > 0) {
+                buttonAudio.play().catch(err => console.log("Erro ao reproduzir áudio do botão:", err));
                 currentQuestion--;
                 loadQuestion();
                 playAudio();
             }
         }
-        
         function playAudio() {
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio.currentTime = 0;
             }
-            
             const question = quizData[currentQuestion];
             const speed = parseFloat(speedSelect.value);
-            
             currentAudio = new Audio(question.audio);
             currentAudio.playbackRate = speed;
-            
             currentAudio.play().catch(e => {
-                alert("Clique em OK para ouvir a palavra");
-                currentAudio.play();
+                console.log("Erro ao reproduzir áudio:", e);
             });
-            
+            playBtn.classList.add('audio-playing');
             playBtn.innerHTML = '⏸';
-            currentAudio.addEventListener('ended', () => playBtn.innerHTML = '▶');
+            currentAudio.addEventListener('ended', () => {
+                playBtn.classList.remove('audio-playing');
+                playBtn.innerHTML = '▶';
+            });
         }
-        
         function changeSpeed() {
             if (currentAudio) {
                 currentAudio.playbackRate = parseFloat(speedSelect.value);
             }
         }
-        
-        function playSound(soundFile) {
-            try {
-                new Audio(soundFile).play();
-            } catch (e) {
-                console.log("Erro ao reproduzir som:", e);
-            }
-        }
-        
         function updateProgressBar() {
-            progressBar.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+            progressBar.style.width = `${((answeredQuestions + 1) / (quizData.length + wrongAnswers.length)) * 100}%`;
         }
-        
         function showResults() {
             quizPage.style.display = 'none';
             resultsPage.style.display = 'flex';
-            
             const totalQuestions = quizData.length;
             const percentage = Math.round((score / totalQuestions) * 100);
-            
             if (percentage >= 95) {
                 resultsTitle.textContent = "EXCELENTE";
-                resultsMessage.innerHTML = `Você acertou ${score} de ${totalQuestions}!<br><br>Continue assim, um excelente resultado!`;
-                resultsMascot.src = "imagens/mascote_feliz.png";
-                playSound('audio/positivo.mp3');
+                resultsMessage.innerHTML = `Parabéns pelo seu desempenho excepcional! Você alcançou um resultado EXCELENTE, acertando ${score} de ${totalQuestions} palavras no quiz de escrita em francês! Isso demonstra um domínio impressionante das expressões e da ortografia francesa. Continue assim, pois seu esforço e dedicação são inspiradores! Este resultado reflete não apenas sua habilidade linguística, mas também sua atenção aos detalhes e compromisso em aprender. Que tal continuar explorando o idioma com o mesmo entusiasmo? A prática constante vai te levar ainda mais longe.`;
+                resultsMascot.src = "MASCOTEFELIZ.png";
+                positiveAudio.play().catch(err => console.log("Erro ao reproduzir áudio positivo:", err));
             } else if (percentage >= 75) {
                 resultsTitle.textContent = "PARABÉNS";
-                resultsMessage.innerHTML = `Você acertou ${score} de ${totalQuestions}!<br><br>Continue assim, um bom resultado!`;
-                resultsMascot.src = "imagens/mascote_alegre.png";
-                playSound('audio/positivo.mp3');
+                resultsMessage.innerHTML = `Parabéns pelo seu desempenho! Você obteve um BOM resultado, acertando ${score} de ${totalQuestions} palavras no quiz de escrita em francês! Isso mostra que você está no caminho certo, com uma sólida compreensão do idioma. Sua dedicação está valendo a pena, e cada palavra certa é um passo rumo à fluência. Continue assim, brilhando no aprendizado do francês!`;
+                resultsMascot.src = "MASCOTEALEGRE.png";
+                positiveAudio.play().catch(err => console.log("Erro ao reproduzir áudio positivo:", err));
             } else if (percentage >= 60) {
                 resultsTitle.textContent = "QUASE LÁ";
-                resultsMessage.innerHTML = `Você acertou ${score} de ${totalQuestions}!<br><br>Não é ruim, mas pode melhorar!`;
-                resultsMascot.src = "imagens/mascote_duvida.png";
-                playSound('audio/negativo.mp3');
+                resultsMessage.innerHTML = `Você alcançou o nível QUASE LÁ, acertando ${score} de ${totalQuestions} palavras no quiz de escrita em francês! Isso indica um progresso notável, com uma boa base no idioma. Sua dedicação está clara, e você está muito próximo de resultados ainda melhores. Cada palavra escrita é um avanço no aprendizado do francês. Continue se empenhando, e logo verá seu desempenho crescer! Siga firme na jornada para dominar o idioma!`;
+                resultsMascot.src = "MASCOTEDUVIDA.png";
+                negativeAudio.play().catch(err => console.log("Erro ao reproduzir áudio negativo:", err));
             } else {
                 resultsTitle.textContent = "NÃO FOI DESSA VEZ";
-                resultsMessage.innerHTML = `Você acertou ${score} de ${totalQuestions}!<br><br>Resultado abaixo do esperado. Tente novamente!`;
-                resultsMascot.src = "imagens/mascote_duvida.png";
-                playSound('audio/negativo.mp3');
+                resultsMessage.innerHTML = `Você obteve o nível NÃO FOI DESSA VEZ, acertando ${score} de ${totalQuestions} palavras no quiz de escrita em francês. Não desanime! Cada tentativa é uma oportunidade de aprendizado, e você já deu o primeiro passo ao participar. O francês pode ser desafiador, mas com prática, você vai melhorar. Reforce as palavras e continue se dedicando. Sua persistência vai te levar mais longe na jornada do idioma!`;
+                resultsMascot.src = "MASCOTETRISTE.png";
+                negativeAudio.play().catch(err => console.log("Erro ao reproduzir áudio negativo:", err));
             }
-            
             localStorage.removeItem('quizProgress');
         }
-        
         function saveProgress() {
             localStorage.setItem('quizProgress', JSON.stringify({
                 currentQuestion,
@@ -697,7 +632,6 @@
                 userAnswers
             }));
         }
-        
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -705,6 +639,19 @@
             }
             return array;
         }
+        let touchStartX = 0;
+        let touchEndX = 0;
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 50 && isAnswerSelected) {
+                nextQuestion();
+            } else if (touchEndX > touchStartX + 50 && currentQuestion > 0) {
+                prevQuestion();
+            }
+        });
     </script>
 </body>
 </html>
