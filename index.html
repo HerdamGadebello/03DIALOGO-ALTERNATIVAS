@@ -17,6 +17,7 @@
         body {
             overflow-x: hidden;
             transition: background-color 0.5s ease;
+            background-color: #F1E1AC; /* Cor de fundo padrão */
         }
         
         /* Página de Introdução */
@@ -26,7 +27,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #002F6C;
+            background-color: #002F6C; /* Azul marinho */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -349,24 +350,23 @@
 <body>
     <!-- Página de Introdução -->
     <div id="intro-page">
-        <video id="intro-video" autoplay muted playsinline>
-            <source src="intro.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos.
+        <video id="intro-video" autoplay muted playsinline onerror="skipIntro()">
+            <source src="video/intro.mp4" type="video/mp4">
         </video>
-        <audio id="intro-audio" autoplay>
-            <source src="intro.mp3" type="audio/mp3">
+        <audio id="intro-audio" autoplay onerror="skipIntro()">
+            <source src="audio/intro.mp3" type="audio/mp3">
         </audio>
     </div>
     
     <!-- Página Inicial do Quiz -->
     <div id="home-page">
-        <img id="mascot-neutral" src="mascote_neutro.png" alt="Mascote">
+        <img id="mascot-neutral" src="imagens/mascote_neutro.png" alt="Mascote">
         <button id="start-button">INICIAR EXERCÍCIO</button>
     </div>
     
     <!-- Página do Quiz -->
     <div id="quiz-page">
-        <img id="logo" src="logo.png" alt="Logo">
+        <img id="logo" src="imagens/logo.png" alt="Logo">
         
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
@@ -377,7 +377,7 @@
                 Escolha a alternativa que melhor traduz a seguinte palavra:
             </div>
             
-            <img id="mascot-small" src="mascote_pequeno.png" alt="Mascote Pequeno">
+            <img id="mascot-small" src="imagens/mascote_pequeno.png" alt="Mascote Pequeno">
             
             <div class="audio-controls">
                 <button class="audio-btn" id="play-btn">▶</button>
@@ -417,23 +417,23 @@
     </div>
     
     <script>
-        // Dados do Quiz (versão reduzida para teste)
+        // Dados do Quiz
         const quizData = [
             {
                 french: "Bonjour",
-                audio: "bonjour.mp3",
+                audio: "audio/bonjour.mp3",
                 options: ["Bom dia", "Boa noite", "Obrigado", "Tchau"],
                 correct: 0
             },
             {
                 french: "Merci",
-                audio: "merci.mp3",
+                audio: "audio/merci.mp3",
                 options: ["Obrigado", "Por favor", "De nada", "Com licença"],
                 correct: 0
             },
             {
                 french: "Au revoir",
-                audio: "au_revoir.mp3",
+                audio: "audio/au_revoir.mp3",
                 options: ["Tchau", "Bom dia", "Boa noite", "Olá"],
                 correct: 0
             }
@@ -469,40 +469,33 @@
         const repeatBtn = document.getElementById('repeat-btn');
         const speedSelect = document.getElementById('speed-select');
         
+        // Função para pular introdução se houver erro
+        function skipIntro() {
+            introPage.style.display = 'none';
+            homePage.style.display = 'flex';
+        }
+        
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
+            // Configurar fallback automático
+            setTimeout(skipIntro, 5000);
+            
             // Verificar progresso salvo
-            const savedProgress = localStorage.getItem('quizProgress');
-            if (savedProgress) {
-                try {
-                    const progress = JSON.parse(savedProgress);
-                    currentQuestion = progress.currentQuestion || 0;
-                    score = progress.score || 0;
-                    answeredQuestions = progress.answeredQuestions || 0;
-                    wrongAnswers = progress.wrongAnswers || [];
-                    userAnswers = progress.userAnswers || [];
-                } catch {
-                    localStorage.removeItem('quizProgress');
+            try {
+                const savedProgress = JSON.parse(localStorage.getItem('quizProgress'));
+                if (savedProgress) {
+                    currentQuestion = savedProgress.currentQuestion || 0;
+                    score = savedProgress.score || 0;
+                    answeredQuestions = savedProgress.answeredQuestions || 0;
+                    wrongAnswers = savedProgress.wrongAnswers || [];
+                    userAnswers = savedProgress.userAnswers || [];
                 }
+            } catch {
+                localStorage.removeItem('quizProgress');
             }
             
             // Configurar eventos
-            introVideo.addEventListener('ended', () => {
-                introPage.style.opacity = '0';
-                setTimeout(() => {
-                    introPage.style.display = 'none';
-                    homePage.style.display = 'flex';
-                }, 1000);
-            });
-            
-            // Fallback caso o vídeo não carregue
-            setTimeout(() => {
-                if (introPage.style.display !== 'none') {
-                    introPage.style.display = 'none';
-                    homePage.style.display = 'flex';
-                }
-            }, 10000);
-            
+            introVideo.addEventListener('ended', skipIntro);
             startButton.addEventListener('click', startQuiz);
             prevBtn.addEventListener('click', prevQuestion);
             nextBtn.addEventListener('click', nextQuestion);
@@ -514,30 +507,24 @@
             shuffleArray(quizData);
         });
         
-        // Funções
+        // Funções do quiz
         function startQuiz() {
             homePage.style.display = 'none';
             quizPage.style.display = 'flex';
             loadQuestion();
             
-            // Iniciar com o áudio da primeira questão
-            setTimeout(() => {
-                playAudio();
-            }, 500);
+            setTimeout(playAudio, 500);
         }
         
         function loadQuestion() {
             const question = quizData[currentQuestion];
             frenchWord.textContent = question.french;
             
-            // Embaralhar opções
             const shuffledOptions = [...question.options];
             shuffleArray(shuffledOptions);
             
-            // Limpar opções anteriores
             optionsContainer.innerHTML = '';
             
-            // Adicionar novas opções
             shuffledOptions.forEach((option, index) => {
                 const button = document.createElement('button');
                 button.classList.add('option-btn', 'slide-in');
@@ -547,19 +534,13 @@
                 optionsContainer.appendChild(button);
             });
             
-            // Atualizar barra de progresso
             updateProgressBar();
-            
-            // Resetar feedback
             feedback.textContent = '';
             feedback.className = 'feedback';
             isAnswerSelected = false;
-            
-            // Configurar navegação
             prevBtn.disabled = currentQuestion === 0;
             nextBtn.textContent = currentQuestion === quizData.length - 1 ? "VER RESULTADO" : "AVANÇAR";
             
-            // Se já respondeu, mostrar a resposta
             if (userAnswers[currentQuestion] !== undefined) {
                 showCorrectAnswer();
             }
@@ -572,33 +553,22 @@
             const correctOption = question.options[question.correct];
             const isCorrect = selectedOption === correctOption;
             
-            // Salvar resposta do usuário
-            userAnswers[currentQuestion] = {
-                selected: selectedOption,
-                isCorrect: isCorrect
-            };
+            userAnswers[currentQuestion] = { selected: selectedOption, isCorrect };
             
-            // Atualizar pontuação
             if (isCorrect) {
                 score++;
                 feedback.textContent = 'CORRETO';
                 feedback.className = 'feedback correct';
-                playSound('win.mp3');
+                playSound('audio/win.mp3');
                 
-                // Remover da lista de erradas se estiver lá
                 const wrongIndex = wrongAnswers.indexOf(currentQuestion);
-                if (wrongIndex !== -1) {
-                    wrongAnswers.splice(wrongIndex, 1);
-                }
+                if (wrongIndex !== -1) wrongAnswers.splice(wrongIndex, 1);
             } else {
                 feedback.textContent = 'INCORRETO';
                 feedback.className = 'feedback incorrect';
-                playSound('error.mp3');
+                playSound('audio/error.mp3');
                 
-                // Adicionar à lista de erradas se não estiver lá
-                if (!wrongAnswers.includes(currentQuestion)) {
-                    wrongAnswers.push(currentQuestion);
-                }
+                if (!wrongAnswers.includes(currentQuestion)) wrongAnswers.push(currentQuestion);
             }
             
             answeredQuestions++;
@@ -612,8 +582,7 @@
             const correctOption = question.options[question.correct];
             const userAnswer = userAnswers[currentQuestion];
             
-            const optionButtons = document.querySelectorAll('.option-btn');
-            optionButtons.forEach(button => {
+            document.querySelectorAll('.option-btn').forEach(button => {
                 if (button.textContent === correctOption) {
                     button.style.backgroundColor = '#3B8C59';
                     button.style.color = 'white';
@@ -626,9 +595,8 @@
         }
         
         function nextQuestion() {
-            playSound('button.mp3');
+            playSound('audio/button.mp3');
             
-            // Se for a última questão, mostrar resultados
             if (currentQuestion === quizData.length - 1) {
                 showResults();
                 return;
@@ -640,7 +608,7 @@
         }
         
         function prevQuestion() {
-            playSound('button.mp3');
+            playSound('audio/button.mp3');
             
             if (currentQuestion > 0) {
                 currentQuestion--;
@@ -650,7 +618,6 @@
         }
         
         function playAudio() {
-            // Parar áudio atual se estiver tocando
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio.currentTime = 0;
@@ -663,36 +630,30 @@
             currentAudio.playbackRate = speed;
             
             currentAudio.play().catch(e => {
-                console.log("Autoplay bloqueado, mostrando mensagem...");
-                alert("Clique em OK para ouvir a palavra em francês");
+                alert("Clique em OK para ouvir a palavra");
                 currentAudio.play();
             });
             
             playBtn.innerHTML = '⏸';
-            currentAudio.addEventListener('ended', () => {
-                playBtn.innerHTML = '▶';
-            });
+            currentAudio.addEventListener('ended', () => playBtn.innerHTML = '▶');
         }
         
         function changeSpeed() {
             if (currentAudio) {
-                const speed = parseFloat(speedSelect.value);
-                currentAudio.playbackRate = speed;
+                currentAudio.playbackRate = parseFloat(speedSelect.value);
             }
         }
         
         function playSound(soundFile) {
             try {
-                const audio = new Audio(soundFile);
-                audio.play();
+                new Audio(soundFile).play();
             } catch (e) {
                 console.log("Erro ao reproduzir som:", e);
             }
         }
         
         function updateProgressBar() {
-            const progress = ((currentQuestion + 1) / quizData.length) * 100;
-            progressBar.style.width = `${progress}%`;
+            progressBar.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
         }
         
         function showResults() {
@@ -702,42 +663,39 @@
             const totalQuestions = quizData.length;
             const percentage = Math.round((score / totalQuestions) * 100);
             
-            // Determinar resultado com base na porcentagem
             if (percentage >= 95) {
                 resultsTitle.textContent = "EXCELENTE";
                 resultsMessage.innerHTML = `Você acertou ${score} de ${totalQuestions}!<br><br>Continue assim, um excelente resultado!`;
-                resultsMascot.src = "mascote_feliz.png";
-                playSound('positivo.mp3');
+                resultsMascot.src = "imagens/mascote_feliz.png";
+                playSound('audio/positivo.mp3');
             } else if (percentage >= 75) {
                 resultsTitle.textContent = "PARABÉNS";
                 resultsMessage.innerHTML = `Você acertou ${score} de ${totalQuestions}!<br><br>Continue assim, um bom resultado!`;
-                resultsMascot.src = "mascote_alegre.png";
-                playSound('positivo.mp3');
+                resultsMascot.src = "imagens/mascote_alegre.png";
+                playSound('audio/positivo.mp3');
             } else if (percentage >= 60) {
                 resultsTitle.textContent = "QUASE LÁ";
                 resultsMessage.innerHTML = `Você acertou ${score} de ${totalQuestions}!<br><br>Não é ruim, mas pode melhorar!`;
-                resultsMascot.src = "mascote_duvida.png";
-                playSound('negativo.mp3');
+                resultsMascot.src = "imagens/mascote_duvida.png";
+                playSound('audio/negativo.mp3');
             } else {
                 resultsTitle.textContent = "NÃO FOI DESSA VEZ";
                 resultsMessage.innerHTML = `Você acertou ${score} de ${totalQuestions}!<br><br>Resultado abaixo do esperado. Tente novamente!`;
-                resultsMascot.src = "mascote_duvida.png";
-                playSound('negativo.mp3');
+                resultsMascot.src = "imagens/mascote_duvida.png";
+                playSound('audio/negativo.mp3');
             }
             
-            // Resetar progresso
             localStorage.removeItem('quizProgress');
         }
         
         function saveProgress() {
-            const progress = {
+            localStorage.setItem('quizProgress', JSON.stringify({
                 currentQuestion,
                 score,
                 answeredQuestions,
                 wrongAnswers,
                 userAnswers
-            };
-            localStorage.setItem('quizProgress', JSON.stringify(progress));
+            }));
         }
         
         function shuffleArray(array) {
