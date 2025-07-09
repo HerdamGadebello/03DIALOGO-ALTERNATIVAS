@@ -418,7 +418,7 @@
         ];
         let currentQuestion = 0;
         let score = 0;
-        let answeredQuestions = 0;
+        let answeredQuestions = new Array(quizData.length).fill(false);
         let wrongAnswers = [];
         let userAnswers = [];
         let isAnswerSelected = false;
@@ -461,7 +461,7 @@
                 if (savedProgress) {
                     currentQuestion = savedProgress.currentQuestion || 0;
                     score = savedProgress.score || 0;
-                    answeredQuestions = savedProgress.answeredQuestions || 0;
+                    answeredQuestions = savedProgress.answeredQuestions || new Array(quizData.length).fill(false);
                     wrongAnswers = savedProgress.wrongAnswers || [];
                     userAnswers = savedProgress.userAnswers || [];
                 }
@@ -478,13 +478,19 @@
             shuffleArray(quizData);
         });
         function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answeredQuestions = new Array(quizData.length).fill(false);
+            wrongAnswers = [];
+            userAnswers = [];
+            localStorage.removeItem('quizProgress');
             homePage.style.display = 'none';
             quizPage.style.display = 'flex';
             loadQuestion();
             setTimeout(playAudio, 500);
         }
         function loadQuestion() {
-            if (currentQuestion >= quizData.length && wrongAnswers.length === 0) {
+            if (answeredQuestions.every(answered => answered) && wrongAnswers.length === 0) {
                 showResults();
                 return;
             }
@@ -492,6 +498,7 @@
                 quizData.push(...wrongAnswers.map(index => quizData[index]));
                 wrongAnswers = [];
                 currentQuestion = 0;
+                answeredQuestions = new Array(quizData.length).fill(false);
             }
             const question = quizData[currentQuestion];
             frenchWord.textContent = question.french;
@@ -511,8 +518,8 @@
             feedback.className = 'feedback';
             isAnswerSelected = false;
             prevBtn.disabled = currentQuestion === 0;
-            nextBtn.textContent = currentQuestion === quizData.length - 1 && wrongAnswers.length === 0 ? "VER RESULTADO" : "AVANÇAR";
-            if (userAnswers[currentQuestion] !== undefined) {
+            nextBtn.textContent = answeredQuestions.every(answered => answered) && wrongAnswers.length === 0 ? "VER RESULTADO" : "AVANÇAR";
+            if (answeredQuestions[currentQuestion]) {
                 showCorrectAnswer();
             }
         }
@@ -535,7 +542,7 @@
                 errorAudio.play().catch(err => console.log("Erro ao reproduzir áudio de erro:", err));
                 if (!wrongAnswers.includes(currentQuestion)) wrongAnswers.push(currentQuestion);
             }
-            answeredQuestions++;
+            answeredQuestions[currentQuestion] = true;
             isAnswerSelected = true;
             showCorrectAnswer();
             saveProgress();
@@ -593,7 +600,9 @@
             }
         }
         function updateProgressBar() {
-            progressBar.style.width = `${((answeredQuestions + 1) / (quizData.length + wrongAnswers.length)) * 100}%`;
+            const totalQuestions = quizData.length + wrongAnswers.length;
+            const answeredCount = answeredQuestions.filter(answered => answered).length;
+            progressBar.style.width = `${(answeredCount / totalQuestions) * 100}%`;
         }
         function showResults() {
             quizPage.style.display = 'none';
